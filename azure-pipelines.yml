@@ -1,55 +1,58 @@
 trigger:
   branches:
     include:
-      - master  # O la rama que utilices para los despliegues
+      - master
 
 pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  renderApiToken: 'rnd_zTf4ojtecctqBDNOkwRAyr7nTkeC'  # Token de Render
-  serviceId: 'srv-cvh2bjlrie7s73ejbm8g'  # ID del servicio en Render
-  dockerRegistryServiceConnection: 'DockerHubServiceConnection'  # Ajusta al nombre real de tu Service Connection
+  # Ajusta tus variables
+  renderApiToken: 'rnd_zTf4ojtecctqBDNOkwRAyr7nTkeC'
+  serviceId: 'srv-cvh2bjlrie7s73ejbm8g'
+  dockerRegistryServiceConnection: 'backendSistemaInventario'
 
 jobs:
-  - job: BuildAndDeploy
-    displayName: 'Build and Deploy Docker container to Render'
-    steps:
-      # Checkout del repositorio
-      - checkout: self
-        clean: true
+- job: BuildAndDeploy
+  displayName: 'Build and Deploy Docker container to Render'
+  steps:
 
-      # Construir la imagen Docker
-      - task: Docker@2
-        displayName: 'Build Docker image'
-        inputs:
-          containerRegistry: $(dockerRegistryServiceConnection)
-          command: build
-          dockerfile: 'backendSistemaInventario/Dockerfile'
-          tags: |
-            $(Build.BuildId)
-            latest
+    # 1. Checkout del código
+    - checkout: self
+      clean: true
 
-      # Desplegar la imagen a Render
-      - task: AzureCLI@2
-        displayName: 'Deploy to Render'
-        inputs:
-          azureSubscription: 'Azure for Students'  # Solo si lo necesitas
-          scriptType: 'bash'
-          scriptLocation: 'inlineScript'
-          inlineScript: |
-            echo "Iniciando despliegue en Render..."
-            response=$(curl -s -w "%{http_code}" -o response.json -X POST https://api.render.com/deployments \
+    # 2. (Opcional) Construir y subir imagen a Docker Hub
+    - task: Docker@2
+      displayName: 'Build and push Docker image'
+      inputs:
+        containerRegistry: $(dockerRegistryServiceConnection)
+        command: buildAndPush
+        dockerfile: 'backendSistemaInventario/Dockerfile'
+        repository: 'jpablo1106/backendSistemaInventario'
+        tags: |
+          $(Build.BuildId)
+          latest
+
+    # 3. Desplegar a Render usando un script Bash
+    - task: Bash@3
+      displayName: 'Deploy to Render'
+      inputs:
+        targetType: 'inline'
+        script: |
+          echo "Iniciando despliegue en Render..."
+          response=$(curl -s -w "%{http_code}" -o response.json \
+                         -X POST https://api.render.com/deployments \
                          -H "Authorization: Bearer $(renderApiToken)" \
                          -H "Content-Type: application/json" \
                          -d '{
-                               "branch": "master", 
+                               "branch": "master",
                                "serviceId": "$(serviceId)"
                              }')
-            if [[ "$response" -eq 200 ]]; then
-              echo "Despliegue exitoso."
-            else
-              echo "Error en el despliegue. Código de respuesta: $response"
-              cat response.json
-              exit 1
-            fi
+
+          if [[ "$response" -eq 200 ]]; then
+            echo "Despliegue exitoso."
+          else
+            echo "Error en el despliegue. Código de respuesta: $response"
+            cat response.json
+            exit 1
+          fi
