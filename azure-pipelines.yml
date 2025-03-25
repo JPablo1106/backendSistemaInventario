@@ -23,7 +23,7 @@ jobs:
         displayName: 'Build Docker image'
         inputs:
           containerRegistry: $(dockerRegistryServiceConnection)
-          dockerfile: '**/Dockerfile'
+          dockerfile: 'backendSistemaInventario/Dockerfile'
           tags: |
             $(Build.BuildId)
             latest
