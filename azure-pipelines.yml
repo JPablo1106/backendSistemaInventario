@@ -9,20 +9,22 @@ pool:
 variables:
   renderApiToken: 'rnd_zTf4ojtecctqBDNOkwRAyr7nTkeC'  # Token de Render
   serviceId: 'srv-cvh2bjlrie7s73ejbm8g'  # ID del servicio en Render
+  dockerRegistryServiceConnection: 'DockerHubServiceConnection'  # Ajusta al nombre real de tu Service Connection
 
 jobs:
   - job: BuildAndDeploy
     displayName: 'Build and Deploy Docker container to Render'
     steps:
-
-      - task: Checkout@2
-        displayName: 'Checkout source code'
+      # Checkout del repositorio
+      - checkout: self
+        clean: true
 
       # Construir la imagen Docker
       - task: Docker@2
         displayName: 'Build Docker image'
         inputs:
           containerRegistry: $(dockerRegistryServiceConnection)
+          command: build
           dockerfile: 'backendSistemaInventario/Dockerfile'
           tags: |
             $(Build.BuildId)
@@ -32,7 +34,7 @@ jobs:
       - task: AzureCLI@2
         displayName: 'Deploy to Render'
         inputs:
-          azureSubscription: 'Azure for Students'  # Si no lo usas, omítelo
+          azureSubscription: 'Azure for Students'  # Solo si lo necesitas
           scriptType: 'bash'
           scriptLocation: 'inlineScript'
           inlineScript: |
