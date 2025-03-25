@@ -1,13 +1,14 @@
 trigger:
   branches:
     include:
-      - master  # o la rama que uses para tus despliegues
+      - master  # O la rama que utilices para los despliegues
 
 pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  dockerRegistryServiceConnection: 'backendSistemaInventario'  # O tu registro en Render, si usas Docker Hub
+  renderApiToken: 'rnd_zTf4ojtecctqBDNOkwRAyr7nTkeC'  # Token de Render
+  serviceId: 'srv-cvh2bjlrie7s73ejbm8g'  # ID del servicio en Render
 
 jobs:
   - job: BuildAndDeploy
@@ -21,24 +22,32 @@ jobs:
       - task: Docker@2
         displayName: 'Build Docker image'
         inputs:
-          containerRegistry: $(dockerRegistryServiceConnection) # Usa tu servicio de contenedor (Docker Hub o Render)
-          dockerfile: 'backendSistemaInventario/Dockerfile'
+          containerRegistry: $(dockerRegistryServiceConnection)
+          dockerfile: '**/Dockerfile'
           tags: |
             $(Build.BuildId)
             latest
 
-      # Desplegar la imagen a Render (puedes usar Docker Push o Render API)
+      # Desplegar la imagen a Render
       - task: AzureCLI@2
         displayName: 'Deploy to Render'
         inputs:
-          azureSubscription: 'Azure for Students'  # Si es necesario, configúralo en la configuración de Azure DevOps
+          azureSubscription: 'Azure for Students'  # Si no lo usas, omítelo
           scriptType: 'bash'
           scriptLocation: 'inlineScript'
           inlineScript: |
-            # Aquí podrías usar Render CLI o la API de Render para hacer el despliegue
-            # Render CLI necesita estar instalado en el agente. Si prefieres usar Docker Hub:
-            # docker push <docker-repository>:$(Build.BuildId)
-            curl -X POST https://api.render.com/deployments \
-                 -H "Authorization: Bearer rnd_zTf4ojtecctqBDNOkwRAyr7nTkeC" \
-                 -H "Content-Type: application/json" \
-                 -d '{"branch": "master", "serviceId": "srv-cvh2bjlrie7s73ejbm8g"}'
+            echo "Iniciando despliegue en Render..."
+            response=$(curl -s -w "%{http_code}" -o response.json -X POST https://api.render.com/deployments \
+                         -H "Authorization: Bearer $(renderApiToken)" \
+                         -H "Content-Type: application/json" \
+                         -d '{
+                               "branch": "master", 
+                               "serviceId": "$(serviceId)"
+                             }')
+            if [[ "$response" -eq 200 ]]; then
+              echo "Despliegue exitoso."
+            else
+              echo "Error en el despliegue. Código de respuesta: $response"
+              cat response.json
+              exit 1
+            fi
