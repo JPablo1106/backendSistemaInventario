@@ -1,4 +1,5 @@
 ﻿using backendSistemaInventario.Aplicacion.Componentes;
+using backendSistemaInventario.DTOS;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -23,6 +24,12 @@ namespace backendSistemaInventario.Controllers
         public async Task<ActionResult<Unit>> Crear(RegistroComponente.EjecutarRegistroComponente data)
         {
             return await _mediator.Send(data);
+        }
+        [HttpGet]
+        [Route("ConsultarComponentes")]
+        public async Task<ActionResult<List<ComponenteDTO>>> GetComponentes()
+        {
+            return await _mediator.Send(new ConsultarComponentes.ListaComponentes());
         }
 
         [HttpPut]

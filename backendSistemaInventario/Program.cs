@@ -10,6 +10,7 @@ using System.Text;
 using Microsoft.OpenApi.Models;
 using backendSistemaInventario.Aplicacion.Equipos;
 using backendSistemaInventario.Aplicacion.Componentes;
+using backendSistemaInventario.Aplicacion.EquiposSeguridad;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -54,7 +55,12 @@ builder.Services.AddMediatR(typeof(EliminarEquipo.Manejador));
 
 //Servicios de componentes
 builder.Services.AddMediatR(typeof(RegistroComponente.Manejador).Assembly);
+builder.Services.AddAutoMapper(typeof(ComponentesProfile));
 builder.Services.AddMediatR(typeof(ActualizarComponente.Manejador));
+
+//Servicios de equipos de seguridad
+builder.Services.AddMediatR(typeof(RegistroEquipoSeguridad));
+builder.Services.AddAutoMapper(typeof(EquiposSeguridadProfile));
 
 //Conexion a SQL Server
 builder.Services.AddDbContext<ContextoBD>(options =>
