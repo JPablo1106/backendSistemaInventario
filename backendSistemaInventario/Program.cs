@@ -121,14 +121,18 @@ if (app.Environment.IsDevelopment())
 app.UseSwagger();
 app.UseSwaggerUI();
 
-//Habilitar CORS antes de autenticacion
+// Habilitar CORS antes de la autenticación
 app.UseCors("AllowAll");
 
 app.UseHttpsRedirection();
 
+// Agrega la autenticación
+app.UseAuthentication();
+
+// Luego la autorización
 app.UseAuthorization();
 
-//Map controller y aplicar autorizacion global
+// Mapear los controladores y aplicar autorización global
 app.MapControllers().RequireAuthorization();
 
 app.Run();
