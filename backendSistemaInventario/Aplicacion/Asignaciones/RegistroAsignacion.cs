@@ -31,8 +31,8 @@ namespace backendSistemaInventario.Aplicacion.Asignaciones
             public DateTime fechaAsignacion { get; set; }
             public string? ipAddress { get; set; }
             public string? ipCpuRed { get; set; }
-            public List<ComponenteAsignado>? Componentes { get; set; }
-            public List<DispositivoExtAsignado>? DispositivosExternosAsignados { get; set; }
+            public List<ComponenteAsignado>? componentes { get; set; }
+            public List<DispositivoExtAsignado>? dispositivosExt { get; set; }
             public int? idEquipoSeguridad {  get; set; }
             public string? numSerieEquipoSeg {  get; set; }
 
@@ -53,8 +53,8 @@ namespace backendSistemaInventario.Aplicacion.Asignaciones
                     .Must(a =>
                     {
                         bool tieneEquipo = a.idEquipo.HasValue && a.idEquipo.Value > 0;
-                        bool tieneComponentes = a.Componentes != null && a.Componentes.Any();
-                        bool tieneDispositivos = a.DispositivosExternosAsignados != null && a.DispositivosExternosAsignados.Any();
+                        bool tieneComponentes = a.componentes != null && a.componentes.Any();
+                        bool tieneDispositivos = a.dispositivosExt != null && a.dispositivosExt.Any();
                         bool tieneEquipoSeg = a.idEquipoSeguridad.HasValue && a.idEquipoSeguridad.Value > 0;
                         return tieneEquipo || tieneComponentes || tieneEquipoSeg;
                     })
@@ -79,14 +79,14 @@ namespace backendSistemaInventario.Aplicacion.Asignaciones
                 });
 
                 // Validaciones para componentes
-                RuleForEach(a => a.Componentes).ChildRules(componente =>
+                RuleForEach(a => a.componentes).ChildRules(componente =>
                 {
                     componente.RuleFor(c => c.idComponente).GreaterThan(0).WithMessage("El ID del componente debe ser válido");
 
                     componente.RuleFor(c => c.numSerieComponente).NotEmpty().WithMessage("El número de serie del componente es obligatorio");
                 });
 
-                RuleForEach(a => a.DispositivosExternosAsignados).ChildRules(dispositivo =>
+                RuleForEach(a => a.dispositivosExt).ChildRules(dispositivo =>
                 {
                     dispositivo.RuleFor(d => d.marca).NotEmpty().WithMessage("La marca del dispositivo es obligatoria");
                     dispositivo.RuleFor(d => d.descripcion).NotEmpty().WithMessage("La descripción del dispositivo es obligatoria");
@@ -113,8 +113,8 @@ namespace backendSistemaInventario.Aplicacion.Asignaciones
                 }
 
                 bool asignaEquipo = request.idEquipo.HasValue && request.idEquipo.Value > 0;
-                bool asignaComponentes = request.Componentes != null && request.Componentes.Any();
-                bool asignaDispositivos = request.DispositivosExternosAsignados != null && request.DispositivosExternosAsignados.Any();
+                bool asignaComponentes = request.componentes != null && request.componentes.Any();
+                bool asignaDispositivos = request.dispositivosExt != null && request.dispositivosExt.Any();
                 bool asignaEquipoSeguridad = request.idEquipoSeguridad.HasValue && request.idEquipoSeguridad.Value > 0;
 
                 if (!asignaEquipo && !asignaComponentes && !asignaDispositivos && !asignaEquipoSeguridad)
@@ -133,7 +133,7 @@ namespace backendSistemaInventario.Aplicacion.Asignaciones
 
                 if (asignaComponentes)
                 {
-                    foreach (var componente in request.Componentes!)
+                    foreach (var componente in request.componentes!)
                     {
                         var existeComponente = await _context.componentes.FindAsync(componente.idComponente);
                         if (existeComponente == null)
@@ -183,7 +183,7 @@ namespace backendSistemaInventario.Aplicacion.Asignaciones
 
                 if (asignaComponentes)
                 {
-                    foreach (var componente in request.Componentes!)
+                    foreach (var componente in request.componentes!)
                     {
                         detalles.Add(new DetalleAsignacion
                         {
@@ -196,7 +196,7 @@ namespace backendSistemaInventario.Aplicacion.Asignaciones
 
                 if (asignaDispositivos)
                 {
-                    var dispositivosValidos = request.DispositivosExternosAsignados!
+                    var dispositivosValidos = request.dispositivosExt!
                         .Where(d => !string.IsNullOrWhiteSpace(d.marca) && d.marca != "string"
                                     && !string.IsNullOrWhiteSpace(d.descripcion) && d.descripcion != "string"
                                     && !string.IsNullOrWhiteSpace(d.numSerieDispExt) && d.numSerieDispExt != "string")
