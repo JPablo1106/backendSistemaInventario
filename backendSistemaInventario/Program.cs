@@ -11,6 +11,8 @@ using Microsoft.OpenApi.Models;
 using backendSistemaInventario.Aplicacion.Equipos;
 using backendSistemaInventario.Aplicacion.Componentes;
 using backendSistemaInventario.Aplicacion.EquiposSeguridad;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -121,18 +123,35 @@ if (app.Environment.IsDevelopment())
 app.UseSwagger();
 app.UseSwaggerUI();
 
-// Habilitar CORS antes de la autenticación
+// Middleware global de manejo de excepciones.
+// Este middleware captura cualquier excepción que se lance en la cadena de ejecución y
+// asegura que se genere una respuesta en formato JSON con el código 500.
+// De esta forma, se evita que se interrumpa el pipeline y se pierda la inyección de los headers CORS.
+app.Use(async (context, next) =>
+{
+    try
+    {
+        await next.Invoke();
+    }
+    catch (Exception ex)
+    {
+        // Aquí puedes registrar la excepción según tu sistema de logging.
+        context.Response.StatusCode = 500;
+        context.Response.ContentType = "application/json";
+        var errorResponse = new { error = ex.Message };
+        await context.Response.WriteAsync(JsonSerializer.Serialize(errorResponse));
+    }
+});
+
+// Habilitar CORS antes de la autenticación y autorización
 app.UseCors("AllowAll");
 
 app.UseHttpsRedirection();
 
-// Agrega la autenticación
 app.UseAuthentication();
-
-// Luego la autorización
 app.UseAuthorization();
 
-// Mapear los controladores y aplicar autorización global
+// Se mapean los controladores y se requiere autorización globalmente
 app.MapControllers().RequireAuthorization();
 
 app.Run();
