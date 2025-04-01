@@ -18,5 +18,5 @@ public class Asignacion
     public Usuario usuario { get; set; }
 
     // Relación con DetalleAsignacion para manejar múltiples componentes
-    public List<DetalleAsignacion> detallesAsignacion { get; set; } = new List<DetalleAsignacion>();
+    public List<DetalleAsignacion> detalleAsignaciones { get; set; } = new List<DetalleAsignacion>();
 }

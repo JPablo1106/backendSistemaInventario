@@ -8,6 +8,6 @@
         public UsuariosDTO usuario { get; set; }
 
         // Nueva lista para múltiples componentes asignados
-        public List<DetalleAsignacionDTO>? detallesAsignacion { get; set; }
+        public List<DetalleAsignacionDTO>? detalleAsignaciones { get; set; }
     }
 }
