@@ -48,7 +48,7 @@ namespace backendSistemaInventario.Controllers
             }
         }
 
-        [HttpPost("logout")]
+        [HttpPost("Logout")]
         [Authorize] // Requiere autenticación
         public async Task<IActionResult> Logout([FromBody] LogoutAdministrador.EjecutarLogout request)
         {
