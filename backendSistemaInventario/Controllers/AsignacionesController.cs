@@ -30,6 +30,42 @@ namespace backendSistemaInventario.Controllers
         {
             return await _mediator.Send(data);
         }
+
+        [HttpGet]
+        [Route("ConsultarAsignacionesCompletas")]
+        public async Task<IActionResult> ObtenerAsignacionesCompleta()
+        {
+            var asignaciones = await _mediator.Send(new ConsultaAsignaciones.Ejecutar());
+
+            var options = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
+            };
+
+            string jsonResponse = JsonSerializer.Serialize(asignaciones, options);
+            return Content(jsonResponse, "application/json");
+        }
+
+        [HttpPut]
+        [Route("ActualizarAsignacion")]
+        public async Task<ActionResult<Unit>> ActualizarAsignacion(ActualizarAsignacion.EjecutarEditarAsignacion data)
+        {
+            return await _mediator.Send(data);
+        }
+
+        [HttpDelete]
+        [Route("EliminarAsignacion/{idAsignacion}")]
+        public async Task<ActionResult<Unit>> EliminarAsignacion(int idAsignacion)
+        {
+            return await _mediator.Send(new EliminarAsignacion.EjecutarEliminarAsignacion
+            {
+                idAsignacion = idAsignacion
+            });
+        }
+
+
+
         [HttpGet]
         [Route("ConsultarAsignaciones")]
         public async Task<IActionResult> ObtenerAsignaciones([FromQuery] string tipo)

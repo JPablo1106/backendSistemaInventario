@@ -48,6 +48,26 @@ namespace backendSistemaInventario.Controllers
             }
         }
 
+        [HttpPost("logout")]
+        [Authorize] // Requiere autenticación
+        public async Task<IActionResult> Logout([FromBody] LogoutAdministrador.EjecutarLogout request)
+        {
+            try
+            {
+                var resultado = await _mediator.Send(request);
+
+                if (resultado)
+                    return Ok(new { mensaje = "Sesión cerrada correctamente" });
+
+                return BadRequest(new { mensaje = "Error al cerrar sesión" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+
         [HttpPost]
         [Route("RefreshToken")]
         [AllowAnonymous]
