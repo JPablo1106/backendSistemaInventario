@@ -1,4 +1,5 @@
 ﻿using backendSistemaInventario.Aplicacion.Asignaciones;
+using backendSistemaInventario.Aplicacion.Servicios;
 using backendSistemaInventario.DTOS;
 using backendSistemaInventario.Helpers;
 using MediatR;
@@ -29,6 +30,19 @@ namespace backendSistemaInventario.Controllers
         public async Task<ActionResult<Unit>> Crear(RegistroAsignacion.EjecutarRegistroAsignacion data)
         {
             return await _mediator.Send(data);
+        }
+
+        [HttpGet("ConsultarAsignacionId/{id}")]
+        public async Task<ActionResult<AsignacionDTO>> ObtenerAsignacionPorId(int id)
+        {
+            var asignacion = await _mediator.Send(new ConsultarAsignacionPorId.Ejecutar(id));
+
+            if (asignacion == null)
+            {
+                return NotFound(new { mensaje = "No se encontró la asignación con el ID especificado." });
+            }
+
+            return Ok(asignacion);
         }
 
         [HttpGet]
@@ -85,7 +99,6 @@ namespace backendSistemaInventario.Controllers
             string jsonResponse = JsonSerializer.Serialize(asignaciones, options);
             return Content(jsonResponse, "application/json");
         }
-
 
         [HttpGet]
         [Route("ConteoAsignaciones")]

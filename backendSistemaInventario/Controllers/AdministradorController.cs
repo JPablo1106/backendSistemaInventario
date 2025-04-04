@@ -89,6 +89,29 @@ namespace backendSistemaInventario.Controllers
             }
         }
 
+        [HttpPost("RecuperarContrasena")]
+        public async Task<IActionResult> RecuperarContrasena([FromBody] RecuperarContrasenaDTO dto)
+        {
+            var resultado = await _mediator.Send(new RecuperarContrasena.Ejecutar
+            {
+                usuario = dto.usuario
+            });
+
+            return Ok(resultado);
+        }
+
+        [HttpPost("RestablecerContrasena")]
+        public async Task<IActionResult> RestablecerContrasena([FromBody] RestablecerContrasenaDTO dto)
+        {
+            var resultado = await _mediator.Send(new RestablecerContrasena.Ejecutar
+            {
+                token = dto.token,
+                nuevaContrasena = dto.nuevaContrasena
+            });
+
+            return Ok(resultado);
+        }
+
     }
 }
 

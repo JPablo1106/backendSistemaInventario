@@ -11,6 +11,8 @@ namespace backendSistemaInventario.Persistencia
 
         public DbSet<RefreshToken> refreshToken {  get; set; }
 
+        public DbSet<PasswordResetToken> passwordResetTokens { get; set; }
+
         public DbSet<Usuario> usuarios { get; set; }
 
         public DbSet<Equipo> equipos { get; set; }
