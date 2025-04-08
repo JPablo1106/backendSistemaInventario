@@ -5,7 +5,6 @@ using backendSistemaInventario.Helpers;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.WebUtilities;
 using System.Text.Json;
 
 namespace backendSistemaInventario.Controllers
@@ -14,7 +13,6 @@ namespace backendSistemaInventario.Controllers
     [ApiController]
     public class AsignacionesController : ControllerBase
     {
-
         private readonly IMediator _mediator;
         private readonly AsignacionesHelper _asignacionesHelper;
 
@@ -22,7 +20,6 @@ namespace backendSistemaInventario.Controllers
         {
             _mediator = mediator;
             _asignacionesHelper = new AsignacionesHelper(mediator);
-
         }
 
         [HttpPost]
@@ -78,17 +75,22 @@ namespace backendSistemaInventario.Controllers
             });
         }
 
-
-
+        // Endpoint para consultar asignaciones con filtros por número de serie, marca y/o modelo
         [HttpGet]
-        [Route("ConsultarAsignaciones")]
-        public async Task<IActionResult> ObtenerAsignaciones([FromQuery] string tipo)
+        [Route("ConsultarAsignacionesBusqueda")]
+        public async Task<IActionResult> ConsultarAsignacionesBusqueda(
+            [FromQuery] string? numeroSerie,
+            [FromQuery] string? marca,
+            [FromQuery] string? modelo)
         {
-            var asignaciones = await _asignacionesHelper.ObtenerAsignacionesAsync(tipo);
-            if (asignaciones == null)
+            var request = new ConsultaAsignacionBusqueda.Ejecutar
             {
-                return BadRequest("Tipo de asignación no reconocido.");
-            }
+                NumeroSerie = numeroSerie,
+                Marca = marca,
+                Modelo = modelo
+            };
+
+            var asignaciones = await _mediator.Send(request);
 
             var options = new JsonSerializerOptions
             {
@@ -115,133 +117,5 @@ namespace backendSistemaInventario.Controllers
             string jsonResponse = JsonSerializer.Serialize(resultado, options);
             return Content(jsonResponse, "application/json");
         }
-        /*
-        [HttpGet]
-        [Route("ConsultarAsignacionesEquipos")]
-        public async Task<IActionResult> ObtenerAsignacionesEquipos()
-        {
-            var asignaciones = await _mediator.Send(new ConsultarAsignacionesEquipos.EjecutarConsulta());
-
-            var options = new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
-            };
-
-            // Serializar la respuesta ignorando los campos no deseados
-            string jsonResponse = JsonSerializer.Serialize(asignaciones, options);
-
-            return Content(jsonResponse, "application/json");
-        }
-
-        [HttpGet]
-        [Route("ConsultarAsignacionesMonitores")]
-        public async Task<IActionResult> ObtenerAsignacionesMonitores()
-        {
-            var asignaciones = await _mediator.Send(new ConsultarAsignacionesMonitores.EjecutarConsultaMonitores());
-
-            var options = new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
-            };
-
-            // Serializar la respuesta ignorando los campos no deseados
-            string jsonResponse = JsonSerializer.Serialize(asignaciones, options);
-
-            return Content(jsonResponse, "application/json");
-        }
-
-        [HttpGet]
-        [Route("ConsultarAsignacionesTeclados")]
-        public async Task<IActionResult> ObtenerAsignacionesTeclados()
-        {
-            var asignaciones = await _mediator.Send(new ConsultarAsignacionesTeclados.EjecutarConsultaTeclados());
-
-            var options = new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
-            };
-
-            // Serializar la respuesta ignorando los campos no deseados
-            string jsonResponse = JsonSerializer.Serialize(asignaciones, options);
-
-            return Content(jsonResponse, "application/json");
-        }
-
-        [HttpGet]
-        [Route("ConsultarAsignacionesTelefonos")]
-        public async Task<IActionResult> ObtenerAsignacionesTelefonos()
-        {
-            var asignaciones = await _mediator.Send(new ConsultarAsignacionesTelefonos.EjecutarConsultaTelefonos());
-
-            var options = new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
-            };
-
-            // Serializar la respuesta ignorando los campos no deseados
-            string jsonResponse = JsonSerializer.Serialize(asignaciones, options);
-
-            return Content(jsonResponse, "application/json");
-        }
-
-        [HttpGet]
-        [Route("ConsultarAsignacionesMouse")]
-        public async Task<IActionResult> ObtenerAsignacionesMouse()
-        {
-            var asignaciones = await _mediator.Send(new ConsultarAsignacionesMouse.EjecutarConsultaMouse());
-
-            var options = new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
-            };
-
-            // Serializar la respuesta ignorando los campos no deseados
-            string jsonResponse = JsonSerializer.Serialize(asignaciones, options);
-
-            return Content(jsonResponse, "application/json");
-        }
-
-        [HttpGet]
-        [Route("ConsultarAsignacionesEquiposSeguridad")]
-        public async Task<IActionResult> ObtenerAsignacionesEquiposSeguridad()
-        {
-            var asignaciones = await _mediator.Send(new ConsultarAsignacionesEquiposSeguridad.EjecutarConsultaEquiposSeguridad());
-
-            var options = new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
-            };
-
-            // Serializar la respuesta ignorando los campos no deseados
-            string jsonResponse = JsonSerializer.Serialize(asignaciones, options);
-
-            return Content(jsonResponse, "application/json");
-        }
-
-
-        [HttpGet]
-        [Route("ConsultarAsignacionesDispositivosExt")]
-        public async Task<IActionResult> ObtenerAsignacionesDispositivosExt()
-        {
-            var asignaciones = await _mediator.Send(new ConsultarAsignacionesDispositivosExt.EjecutarConsultaDispositivosExt());
-
-            var options = new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
-            };
-
-            // Serializar la respuesta ignorando los campos no deseados
-            string jsonResponse = JsonSerializer.Serialize(asignaciones, options);
-
-            return Content(jsonResponse, "application/json");
-        }*/
-
     }
 }
