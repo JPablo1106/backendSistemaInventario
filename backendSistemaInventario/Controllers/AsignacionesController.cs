@@ -75,6 +75,29 @@ namespace backendSistemaInventario.Controllers
             });
         }
 
+        [HttpGet]
+        [Route("ConsultarAsignaciones")]
+        public async Task<IActionResult> ConsultarAsignaciones(string tipo)
+        {
+            var asignaciones = await _asignacionesHelper.ObtenerAsignacionesAsync(tipo);
+
+            if (asignaciones == null)
+            {
+                return NotFound(new { mensaje = $"No se encontraron asignaciones para el tipo '{tipo}'." });
+            }
+
+            var options = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
+            };
+
+            string jsonResponse = JsonSerializer.Serialize(asignaciones, options);
+            return Content(jsonResponse, "application/json");
+        }
+
+
+
         // Endpoint para consultar asignaciones con filtros por número de serie, marca y/o modelo
         [HttpGet]
         [Route("ConsultarAsignacionesBusqueda")]
