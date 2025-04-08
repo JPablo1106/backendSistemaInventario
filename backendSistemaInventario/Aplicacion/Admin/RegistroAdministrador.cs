@@ -2,6 +2,9 @@
 using backendSistemaInventario.Persistencia;
 using FluentValidation;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace backendSistemaInventario.Aplicacion.Admin
 {
@@ -12,19 +15,18 @@ namespace backendSistemaInventario.Aplicacion.Admin
             public string nombreAdmin { get; set; }
             public string usuario { get; set; }
             public string contraseña { get; set; }
-
         }
-        //clase para validar la clase ejecuta a traves de apifluent validator
+
+        // Clase para validar la clase ejecuta a través de API Fluent Validator
         public class EjecutaValidacion : AbstractValidator<EjecutarRegistroAdministrador>
         {
             public EjecutaValidacion()
             {
-                //Estas propiedades no se aceptan valores nulos
+                // Estas propiedades no aceptan valores nulos
                 RuleFor(p => p.nombreAdmin).NotEmpty();
                 RuleFor(p => p.usuario).NotEmpty();
                 RuleFor(p => p.contraseña).NotEmpty();
             }
-
         }
 
         public class Manejador : IRequestHandler<EjecutarRegistroAdministrador>
@@ -38,7 +40,14 @@ namespace backendSistemaInventario.Aplicacion.Admin
 
             public async Task<Unit> Handle(EjecutarRegistroAdministrador request, CancellationToken cancellationToken)
             {
-                //Se crea la instancia del administrador ligada al contexto
+                // Se valida la cantidad de registros existentes en la tabla de administradores
+                int registrosExistentes = await _context.administrador.CountAsync(cancellationToken);
+                if (registrosExistentes >= 4)
+                {
+                    throw new Exception("Solo se autorizan 4 registros");
+                }
+
+                // Se crea la instancia del administrador ligada al contexto
                 var administrador = new Administrador
                 {
                     nombreAdmin = request.nombreAdmin,
@@ -46,11 +55,11 @@ namespace backendSistemaInventario.Aplicacion.Admin
                     contraseña = request.contraseña
                 };
 
-                //Se agrega el objeto del tipo administrador
+                // Se agrega el objeto del tipo administrador
                 _context.administrador.Add(administrador);
-                //Insertamos el valor de insercion
-                var respuesta = await _context.SaveChangesAsync();
-                if(respuesta > 0)
+                // Insertamos el valor de inserción
+                var respuesta = await _context.SaveChangesAsync(cancellationToken);
+                if (respuesta > 0)
                 {
                     return Unit.Value;
                 }

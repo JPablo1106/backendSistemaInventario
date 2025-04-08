@@ -32,5 +32,20 @@ namespace backendSistemaInventario.Controllers
         {
             return await _mediator.Send(new ConsultarEquiposSeguridad.ListaEquiposSeguridad());
         }
+
+        [HttpPut]
+        [Route("ActualizarEquipoSeguridad")]
+        public async Task<ActionResult<EquipoSeguridadDTO>> ActualizarEquipoSeguridad(ActualizarEquipoSeguridad.EjecutarActualizarEquipoSeguridad data)
+        {
+            return await _mediator.Send(data);
+        }
+
+        [HttpDelete]
+        [Route("EliminarEquipoSeguridad")]
+        public async Task<IActionResult> EliminarEquipoSeguridad([FromBody] EliminarEquipoSeguridad.EjecutarEliminarEquipoSeguridad request)
+        {
+            await _mediator.Send(request);
+            return Ok(new { mensaje = "Equipo de seguridad eliminado correctamente" });
+        }
     }
 }

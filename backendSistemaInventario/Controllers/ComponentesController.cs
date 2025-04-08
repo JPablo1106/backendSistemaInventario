@@ -38,5 +38,12 @@ namespace backendSistemaInventario.Controllers
         {
             return await (_mediator.Send(data));
         }
+        [HttpDelete]
+        [Route("EliminarComponente")]
+        public async Task<IActionResult> EliminarComponente([FromBody] EliminarComponente.EjecutarEliminarComponente request)
+        {
+            await _mediator.Send(request);
+            return Ok(new { mensaje = "Componente eliminado correctamente" });
+        }
     }
 }
