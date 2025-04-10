@@ -33,7 +33,7 @@ namespace backendSistemaInventario.Controllers
             return await _mediator.Send(new ConsultaUsuarios.ListaUsuarios());
         }
 
-        [HttpGet("ConsultarUsuario/{idUsuario}")]
+        [HttpGet("ConsultarUsuarioPorId/{idUsuario}")]
         public async Task<ActionResult<UsuariosDTO>> ObtenerUsuarioPorId(int idUsuario)
         {
             var usuario = await _mediator.Send(new ConsultaUsuarioPorId.Ejecuta { idUsuario = idUsuario });
