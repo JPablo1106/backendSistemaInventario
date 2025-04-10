@@ -49,7 +49,7 @@ namespace backendSistemaInventario.Aplicacion.Admin
                 var newRefreshToken = new RefreshToken
                 {
                     token = refreshTokenString,
-                    expira = DateTime.UtcNow.AddDays(7), // Establece la expiración deseada
+                    expira = DateTime.UtcNow.AddDays(7),
                     esValido = true,
                     administradorId = admin.idAdministrador
                 };

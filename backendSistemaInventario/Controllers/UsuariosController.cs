@@ -33,6 +33,20 @@ namespace backendSistemaInventario.Controllers
             return await _mediator.Send(new ConsultaUsuarios.ListaUsuarios());
         }
 
+        [HttpGet("ConsultarUsuario/{idUsuario}")]
+        public async Task<ActionResult<UsuariosDTO>> ObtenerUsuarioPorId(int idUsuario)
+        {
+            var usuario = await _mediator.Send(new ConsultaUsuarioPorId.Ejecuta { idUsuario = idUsuario });
+
+            if (usuario == null)
+            {
+                return NotFound(new { mensaje = "No se encontró el usuario con el ID especificado." });
+            }
+
+            return Ok(usuario);
+        }
+
+
         [HttpPut]
         [Route("ActualizarUsuario")]
         public async Task<ActionResult<UsuariosDTO>> ActualizarUsuario(ActualizarUsuario.EjecutarActualizarUsuario data)
