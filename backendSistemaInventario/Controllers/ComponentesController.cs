@@ -32,6 +32,18 @@ namespace backendSistemaInventario.Controllers
             return await _mediator.Send(new ConsultarComponentes.ListaComponentes());
         }
 
+        [HttpGet]
+        [Route("ConsultarComponentePorId")]
+        public async Task<ActionResult<ComponenteDTO>>ObtenerComponentePorId(int idComponente)
+        {
+            var componente = await _mediator.Send(new ConsultarComponentePorId.EjecutaConsultaComponenteId { idComponente = idComponente });
+            if (componente == null)
+            {
+                return NotFound(new { mensaje = "No se encontró el componente con el ID especificado" });
+            }
+            return Ok(componente);
+        }
+
         [HttpPut]
         [Route("ActualizarComponente")]
         public async Task<ActionResult<Unit>> ActualizarComponente(ActualizarComponente.EjecutarActualizarComponente data)

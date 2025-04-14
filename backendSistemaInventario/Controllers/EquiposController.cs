@@ -34,6 +34,20 @@ namespace backendSistemaInventario.Controllers
         {
             return await _mediator.Send(new ConsultarEquipos.ListaEquipos());
         }
+
+        [HttpGet]
+        [Route("ConsultaEquipoPorId")]
+        public async Task<ActionResult<EquipoDTO>>ObtenerEquipoPorId(int idEquipo)
+        {
+            var equipo = await _mediator.Send(new ConsultarEquipoPorId.EjecutarConsultaEquipoId { idEquipo = idEquipo });
+            
+            if(equipo == null)
+            {
+                return NotFound(new { mensaje = "No se encontró el equipo con el ID especificado. " });
+            }
+
+            return Ok(equipo);
+        }
        
         [HttpPut]
         [Route("ActualizarEquipo")]
