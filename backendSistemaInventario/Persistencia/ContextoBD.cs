@@ -36,5 +36,11 @@ namespace backendSistemaInventario.Persistencia
         public DbSet<Asignacion> asignaciones { get; set; }
 
         public DbSet<DetalleAsignacion> detalleAsignaciones { get; set; }
+
+        public DbSet<Celular> celulares { get; set; }
+
+        public DbSet<Tableta> tabletas {  get; set; }
+
+        public DbSet<Radio> radios {  get; set; }
     }
 }

@@ -58,7 +58,7 @@ namespace backendSistemaInventario.Aplicacion.Componentes
                 {
                     "Monitor" => new Monitores { modeloMonitor = request.modeloMonitor },
                     "Teclado" => new Teclado { idiomaTeclado = request.idiomaTeclado },
-                    "Telefono IP" or "Teléfeono IP" => new Telefono { modeloTelefono = request.modeloTelefono },
+                    "Telefono IP" or "Teléfono IP" => new Telefono { modeloTelefono = request.modeloTelefono },
                     "Mouse" => new Mouse(),
                     _ => throw new Exception("Tipo de componente no válido")
                 };
